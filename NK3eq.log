@@ -1,0 +1,78 @@
+Starting Dynare (version 6.3).
+Calling Dynare with arguments: none
+Starting preprocessing of the model file ... 
+Found 6 equation(s). 
+Evaluating expressions... 
+Computing static model derivatives (order 1). 
+Normalizing the static model... 
+Finding the optimal block decomposition of the static model... 
+4 block(s) found: 
+  3 recursive block(s) and 1 simultaneous block(s). 
+  the largest simultaneous block has 3 equation(s) 
+                                 and 3 feedback variable(s). 
+Computing dynamic model derivatives (order 2). 
+Normalizing the dynamic model... 
+Finding the optimal block decomposition of the dynamic model... 
+2 block(s) found: 
+  1 recursive block(s) and 1 simultaneous block(s). 
+  the largest simultaneous block has 3 equation(s) 
+                                 and 3 feedback variable(s). 
+Preprocessing completed. 
+Preprocessing time: 0h00m01s.
+
+MODEL SUMMARY
+
+  Number of variables:         6
+  Number of stochastic shocks: 3
+  Number of state variables:   4
+  Number of jumpers:           2
+  Number of static variables:  0
+
+
+MATRIX OF COVARIANCE OF EXOGENOUS SHOCKS
+Variables       eta_D     eta_S     eta_R
+eta_D        0.000400  0.000000  0.000000
+eta_S        0.000000  0.000016  0.000000
+eta_R        0.000000  0.000000  0.000001
+
+POLICY AND TRANSITION FUNCTIONS
+                                   y              pi               r
+r(-1)                      -1.854918       -0.660507        0.527651
+e_D(-1)                     1.854918        0.660507        0.272349
+e_S(-1)                    -1.579026        2.876768        0.799869
+e_R(-1)                    -1.388508       -0.577148        0.171315
+eta_D                       2.318648        0.825634        0.340436
+eta_S                      -1.662133        3.028176        0.841968
+eta_R                      -3.471271       -1.442871        0.428288
+
+
+THEORETICAL MOMENTS
+VARIABLE         MEAN  STD. DEV.   VARIANCE
+y              0.0000     0.0821     0.0067
+pi             0.0000     0.0323     0.0010
+r              0.0000     0.0304     0.0009
+
+
+
+VARIANCE DECOMPOSITION (in percent)
+       eta_D   eta_S   eta_R
+y      44.18   55.53    0.29
+pi     36.17   63.53    0.30
+r      47.48   52.47    0.05
+
+
+
+MATRIX OF CORRELATIONS
+Variables          y       pi        r
+y             1.0000  -0.1325  -0.2371
+pi           -0.1325   1.0000   0.8056
+r            -0.2371   0.8056   1.0000
+
+
+
+COEFFICIENTS OF AUTOCORRELATION
+Order          1       2       3       4       5
+y         0.7833  0.6560  0.5767  0.5232  0.4841
+pi        0.7514  0.6089  0.5231  0.4677  0.4288
+r         0.9601  0.8884  0.8084  0.7306  0.6596
+Total computing time : 0h00m16s

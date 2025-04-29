@@ -67,5 +67,5 @@ save myobs gy_obs gc_obs gi_obs h_obs T pi_obs r_obs u_obs;
 % title('nominal rate')
 % subplot(1,4,4)
 % plot(T,u_obs)
-xlim([min(T) max(T)]);
-title('unemployment rate')
+% xlim([min(T) max(T)]);
+% title('unemployment rate')

@@ -1,0 +1,18 @@
+# Ignore all files
+*
+
+# Do not ignore files ending with .mod
+!*.mod
+
+# Do not ignore files ending with .m
+!*.m
+
+# Do not ignore files ending with .md
+!*.md
+
+# Do not ignore .gitattributes file
+!.gitattributes
+
+# Do not ignore .gitignore file
+!.gitignore
+

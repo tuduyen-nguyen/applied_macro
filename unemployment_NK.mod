@@ -241,4 +241,24 @@ mh_nblocks=1,                 % number of mcmc chains
 forecast=8                    % forecasts horizon
 ) gy_obs pi_obs r_obs gc_obs gi_obs u_obs;
 
+
+% Load estimated parameters IN THE MODEL
+fn = fieldnames(oo_.posterior_mean.parameters);
+for ix = 1:size(fn,1)
+	set_param_value(fn{ix},eval(['oo_.posterior_mean.parameters.' fn{ix} ]))
+end
+% Load estimated shocks IN THE MODEL
+fx = fieldnames(oo_.posterior_mean.shocks_std);
+for ix = 1:size(fx,1)
+	idx = strmatch(fx{ix},M_.exo_names,'exact');
+	M_.Sigma_e(idx,idx) = eval(['oo_.posterior_mean.shocks_std.' fx{ix}])^2;
+end
+
+% SIMULATE THE ESTIMATED MODEL
+stoch_simul(irf=30,conditional_variance_decomposition=[1,4,10,100],order=1) gy_obs pi_obs r_obs;
+
+% DECOMPOSE THE SHOCK ACCORDING TO GDP GROWTH, INFLATION, AND INTEREST RATE
+shock_decomposition gy_obs pi_obs r_obs;
+
+
 % stoch_simul(irf=30,order=1) y c i pi r u x ;

@@ -52,20 +52,20 @@ save myobs gy_obs gc_obs gi_obs h_obs T pi_obs r_obs u_obs;
 % title('hours worked')
 % 
 % 
-% figure;
-% subplot(1,4,1)
-% plot(T,gy_obs)
-% xlim([min(T) max(T)]);
-% title('output growth')
-% subplot(1,4,2)
-% plot(T,pi_obs)
-% xlim([min(T) max(T)]);
-% title('inflation rate')
-% subplot(1,4,3)
-% plot(T,r_obs)
-% xlim([min(T) max(T)]);
-% title('nominal rate')
-% subplot(1,4,4)
-% plot(T,u_obs)
-% xlim([min(T) max(T)]);
-% title('unemployment rate')
+figure;
+subplot(2,2,1)
+plot(T,gy_obs)
+xlim([min(T) max(T)]);
+title('output growth')
+subplot(2,2,2)
+plot(T,pi_obs)
+xlim([min(T) max(T)]);
+title('inflation rate')
+subplot(2,2,3)
+plot(T,r_obs)
+xlim([min(T) max(T)]);
+title('nominal rate')
+subplot(2,2,4)
+plot(T,u_obs)
+xlim([min(T) max(T)]);
+title('unemployment rate')

@@ -255,10 +255,10 @@ for ix = 1:size(fx,1)
 end
 
 % SIMULATE THE ESTIMATED MODEL
-stoch_simul(irf=30,conditional_variance_decomposition=[1,4,10,100],order=1) gy_obs pi_obs r_obs;
+stoch_simul(irf=30,conditional_variance_decomposition=[1,4,10,100],order=1) gy_obs pi_obs r_obs u_obs;
 
 % DECOMPOSE THE SHOCK ACCORDING TO GDP GROWTH, INFLATION, AND INTEREST RATE
-shock_decomposition gy_obs pi_obs r_obs;
+shock_decomposition gy_obs pi_obs r_obs u_obs;
 
 
 % stoch_simul(irf=30,order=1) y c i pi r u x ;

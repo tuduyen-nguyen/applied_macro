@@ -1,5 +1,4 @@
-% load Airline data
-% load Data_Airline;
+% load data
 load myobs.mat;
 
 
@@ -13,7 +12,6 @@ initialize_dseries_class();
 
 
 % convert data into dseries object
-% ts = dseries(Data,'1949M1');
 ts = dseries(u_obs, '1994Q1');
 % disp(ts)
 
@@ -46,3 +44,5 @@ plot(T,o.y.data,T,(o.y.data)./(season_y.data))
 xlim([min(T),max(T)])
 datetick('x','mm-yyyy','keeplimits')
 grid on;
+
+deseasoned_u_obs = (o.y.data)./(season_y.data);

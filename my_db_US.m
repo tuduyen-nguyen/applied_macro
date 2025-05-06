@@ -1,4 +1,5 @@
 [output_table,~,T] = call_dbnomics('OECD/QNA/USA.B1_GE.CQRSA.Q','OECD/QNA/USA.P31DC.CQRSA.Q','OECD/QNA/USA.P51.CQRSA.Q','OECD/QNA/USA.B1_GE.DNBSA.Q','OECD/MEI/USA.HOHWMN02.STSA.Q','OECD/KEI/IR3TIB01.USA.ST.Q', 'ILO/UNE_DEAP_SEX_AGE_MTS_RT/USA.BA_453.AGE_AGGREGATE_TOTAL.MTS_AGGREGATE_TOTAL.SEX_T.Q');
+
 % Output, Consumption, Investment, Deflator, Weekly Hours, Nominal Rate, Unemployment rate
 
 % select non NaN ids
@@ -30,28 +31,37 @@ u_obs = output_table(2:end,8)/100;
 
 T = T(2:end);
 
+% load dseries object
+initialize_dseries_class();
+% convert data into dseries object
+ts = dseries(u_obs, '1994Q1');
+% create the x13 object
+o = x13(ts);
+% adjust options
+o.transform('function','log');
+o.arima('model',' (0 1 1)4');
+o.x11('save','(d10)');
+% run
+o.run();
+% extract the multiplicative seasonal pattern
+season_y = o.results.d10;
+% delete useless files
+hk = char('d10','err','log','out','spc');
+for i0 = 1:size(hk,1)
+    eval(['delete ' o.results.name '.' hk(i0,:) ';']);
+end
+% display results
+figure;
+plot(T,o.y.data,T,(o.y.data)./(season_y.data))
+xlim([min(T),max(T)])
+datetick('x','mm-yyyy','keeplimits')
+grid on;
+
+u_obs = (o.y.data)./(season_y.data);
+
 % save into myobs.mat
 save myobs gy_obs gc_obs gi_obs h_obs T pi_obs r_obs u_obs;
 
-% figure;
-% subplot(2,2,1)
-% plot(T,gy_obs)
-% xlim([min(T) max(T)]);
-% title('output growth')
-% subplot(2,2,2)
-% plot(T,gc_obs)
-% xlim([min(T) max(T)]);
-% title('consumption growth')
-% subplot(2,2,3)
-% plot(T,gi_obs)
-% xlim([min(T) max(T)]);
-% title('investment growth')
-% subplot(2,2,4)
-% plot(T,h_obs)
-% xlim([min(T) max(T)]);
-% title('hours worked')
-% 
-% 
 figure;
 subplot(2,2,1)
 plot(T,gy_obs)
@@ -66,6 +76,6 @@ plot(T,r_obs)
 xlim([min(T) max(T)]);
 title('nominal rate')
 subplot(2,2,4)
-plot(T,u_obs)
+plot(T,u_obs);
 xlim([min(T) max(T)]);
 title('unemployment rate')

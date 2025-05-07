@@ -128,9 +128,9 @@ model;
 	[name='measurement inflation']
 	pi_obs = pi - steady_state(pi);
 	[name='measurement interest rate']
-	r_obs  = r  - steady_state(r);
+    r_obs = r - r(-1);
 	[name='measurement unemployment']
-	u_obs  = u  - steady_state(u);
+    u_obs = u - u(-1);
 	
 	[name='shocks']
 	log(e_a) = rho_a*log(e_a(-1))+eta_a;

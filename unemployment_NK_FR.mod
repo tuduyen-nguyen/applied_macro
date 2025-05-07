@@ -128,9 +128,9 @@ model;
 	[name='measurement inflation']
 	pi_obs = pi - steady_state(pi);
 	[name='measurement interest rate']
-	r_obs  = r  - steady_state(r);
+    r_obs = r - r(-1);
 	[name='measurement unemployment']
-	u_obs  = u  - steady_state(u);
+    u_obs = u - u(-1);
 	
 	[name='shocks']
 	log(e_a) = rho_a*log(e_a(-1))+eta_a;
@@ -209,24 +209,24 @@ varobs gy_obs gc_obs gi_obs pi_obs r_obs u_obs ;
 % PARAMETRES A ESTIMER AVEC LES PRIORS ET VALEURS INITIALES ASSOCIEES
 estimated_params;
     stderr eta_g,    ,       ,       ,       INV_GAMMA_PDF,  .01,      2;
-    rho_g,   .92,     ,       ,       beta_pdf,       .5,      0.1;  % Réduire l'écart-type
+    rho_g,   .92,     ,       ,       beta_pdf,       .5,      0.2;
     stderr eta_m,    ,       ,       ,       INV_GAMMA_PDF,  .01,      2;
-    rho_m,   .92,     ,       ,       beta_pdf,       .5,      0.1;  % Réduire l'écart-type
+    rho_m,   .92,     ,       ,       beta_pdf,       .5,      0.2;
     stderr eta_r,    ,       ,       ,       INV_GAMMA_PDF,  .01,      2;
-    rho_r,   .5,      ,       ,       beta_pdf,       .5,      0.1;  % Réduire l'écart-type
+    rho_r,   .5,      ,       ,       beta_pdf,       .5,      0.2;
     stderr eta_c,    ,       ,       ,       INV_GAMMA_PDF,  .01,      2;
-    rho_c,   .96,     ,       ,       beta_pdf,       .5,      0.2;  % Réduire l'écart-type
+    rho_c,   .96,     ,       ,       beta_pdf,       .5,      0.2;
     stderr eta_i,    ,       ,       ,       INV_GAMMA_PDF,  .01,      2;
-    rho_i,   .9,      ,       ,       beta_pdf,       .5,      0.1;  % Réduire l'écart-type
+    rho_i,   .9,      ,       ,       beta_pdf,       .5,      0.2;
 
-    sigmaC,  2,       ,       ,       normal_pdf,     1.5,     0.2;  % Réduire l'écart-type
-    sigmaL,  0.8,     ,       ,       gamma_pdf,      2,       0.3;  % Réduire l'écart-type
-    delta_N, .34,     ,       ,       beta_pdf,       .75,     0.1;  % Réduire l'écart-type
-    kappa,   6,       ,       ,       gamma_pdf,      4,       1;  % Réduire l'écart-type
-    xi,      106,    0,      ,       gamma_pdf,      100,     5;  % Réduire l'écart-type
-    rho,     .45,     ,       ,       beta_pdf,       .75,     0.05;  % Réduire l'écart-type
-    phi_pi,  1.8,     ,       ,       gamma_pdf,      1.5,     0.1;  % Réduire l'écart-type
-    phi_y,   0.05,    ,       ,       gamma_pdf,      0.12,    0.02;  % Réduire l'écart-type
+    sigmaC,  2,       ,       ,       normal_pdf,     1.5,     0.35;
+    sigmaL,  0.8,     ,       ,       gamma_pdf,      2,       0.5;
+    delta_N, .34,     ,       ,       beta_pdf,       .75,     0.1;
+    kappa,   6,       ,       ,       gamma_pdf,      4,       1.5;
+    xi,      106,    0,      ,       gamma_pdf,      100,     15;
+    rho,     .45,     ,       ,       beta_pdf,       .75,     0.1;
+    phi_pi,  1.8,     ,       ,       gamma_pdf,      1.5,     0.25;
+    phi_y,   0.05,    ,       ,       gamma_pdf,      0.12,    0.05;
 end;
 
 

@@ -69,6 +69,24 @@ u_obs = u_obs - mean(u_obs);
 r_obs = r_obs - mean(r_obs);
 pi_obs = pi_obs - mean(pi_obs);
 
+timeSeriesList = {gy_obs, gc_obs, gi_obs, h_obs, pi_obs, r_obs, u_obs};
+
+% Boucle sur chaque série temporelle
+for i = 1:length(timeSeriesList)
+    data = timeSeriesList{i};
+
+    % Perform Augmented Dickey-Fuller test
+    [h, pValue, stat, cValue, reg] = adftest(data, 'model', 'AR', 'alpha', 0.05);
+
+    % Afficher les résultats
+    fprintf('Résultats du test ADF pour la série %d:\n', i);
+    fprintf('h = %d\n', h);
+    fprintf('pValue = %.4f\n', pValue);
+    fprintf('stat = %.4f\n', stat);
+    fprintf('criticalValue = %.4f\n', cValue);
+    fprintf('-------------------------\n');
+end
+
 % save into myobs.mat
 save myobs_FR gy_obs gc_obs gi_obs h_obs T pi_obs r_obs u_obs;
 

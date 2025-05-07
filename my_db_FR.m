@@ -1,4 +1,4 @@
-[output_table,~,T] = call_dbnomics('OECD/QNA/USA.B1_GE.CQRSA.Q','OECD/QNA/USA.P31DC.CQRSA.Q','OECD/QNA/USA.P51.CQRSA.Q','OECD/QNA/USA.B1_GE.DNBSA.Q','OECD/MEI/USA.HOHWMN02.STSA.Q','OECD/KEI/IR3TIB01.USA.ST.Q', 'ILO/UNE_DEAP_SEX_AGE_MTS_RT/USA.BA_453.AGE_AGGREGATE_TOTAL.MTS_AGGREGATE_TOTAL.SEX_T.Q');
+[output_table,~,T] = call_dbnomics('OECD/QNA/FRA.B1_GE.CQRSA.Q','OECD/QNA/FRA.P31DC.CQRSA.Q','OECD/QNA/FRA.P51.CQRSA.Q','OECD/QNA/FRA.B1_GE.DNBSA.Q','Eurostat/LFSQ_EWHAIS/Q.TOTAL.SAL.TOTAL.Y_GE15.T.HR.FR','OECD/KEI/IR3TIB01.FRA.ST.Q', 'Eurostat/LFSQ_URGACOB/Q.TOTAL.T.Y15-74.PC.FR');
 
 % Output, Consumption, Investment, Deflator, Weekly Hours, Nominal Rate, Unemployment rate
 
@@ -7,6 +7,11 @@ idx 			= find(~isnan(sum(output_table(:,2:end),2)));
 output_table 	= output_table(idx,:);
 T				= T(idx);
 
+% Filter data from 2003 onwards (start of quarterly data)
+start_year = 2003;
+start_idx = find(T >= start_year, 1);
+output_table = output_table(start_idx:end, :);
+T = T(start_idx:end);
 
 % we normalize to one prices and in population for 2015
 id2015 = find(T==2015);
@@ -34,7 +39,7 @@ T = T(2:end);
 % load dseries object
 initialize_dseries_class();
 % convert data into dseries object
-ts = dseries(u_obs, '1994Q1');
+ts = dseries(u_obs, '2003Q1');
 % create the x13 object
 o = x13(ts);
 % adjust options
@@ -58,10 +63,14 @@ datetick('x','mm-yyyy','keeplimits')
 grid on;
 
 u_obs = (o.y.data)./(season_y.data);
-u_obs_demeaned = u_obs - mean(u_obs);
+
+% demeaning variables according to model specification
+u_obs = u_obs - mean(u_obs);
+r_obs = r_obs - mean(r_obs);
+pi_obs = pi_obs - mean(pi_obs);
 
 % save into myobs.mat
-save myobs_US gy_obs gc_obs gi_obs h_obs T pi_obs r_obs u_obs u_obs_demeaned;
+save myobs_FR gy_obs gc_obs gi_obs h_obs T pi_obs r_obs u_obs;
 
 figure;
 subplot(2,2,1)
@@ -95,6 +104,6 @@ plot(T,r_obs)
 xlim([min(T) max(T)]);
 title('nominal rate')
 subplot(2,2,4)
-plot(T,u_obs,T,u_obs_demeaned);
+plot(T,u_obs);
 xlim([min(T) max(T)]);
 title('unemployment rate')

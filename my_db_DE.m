@@ -23,18 +23,13 @@ gy_obs  = diff(log(output_table(:,2)./(def)));
 gc_obs  = diff(log(output_table(:,3)./(def)));
 gi_obs  = diff(log(output_table(:,4)./(def)));
 
-% hours worked as a fraction per day instead of weekly amount
-h_obs	= output_table(2:end,6)/(7*24);
-
 % inflation rate
 pi_obs  = diff(log(def));
 % quarterly interest rate
-r_obs	= output_table(2:end,7)/400;
+r_obs	= (output_table(:,7)/400);
 
 % unemployment rate
-u_obs = output_table(2:end,8)/100;
-
-T = T(2:end);
+u_obs = (output_table(:,8)/100);
 
 % load dseries object
 initialize_dseries_class();
@@ -64,26 +59,44 @@ grid on;
 
 u_obs = (o.y.data)./(season_y.data);
 
+T = T(2:end);
+u_obs = diff(u_obs);
+r_obs = diff(r_obs);
+
+timeSeriesList = {gy_obs, gc_obs, gi_obs, pi_obs, r_obs, u_obs};
+
+% Boucle sur chaque série temporelle
+for i = 1:length(timeSeriesList)
+    data = timeSeriesList{i};
+
+    % Perform Augmented Dickey-Fuller test
+    [h, pValue, stat, cValue, reg] = adftest(data, 'model', 'AR', 'alpha', 0.05);
+
+    % Afficher les résultats
+    fprintf('Résultats du test ADF pour la série %d:\n', i);
+    fprintf('h = %d\n', h);
+    fprintf('pValue = %.4f\n', pValue);
+    fprintf('stat = %.4f\n', stat);
+    fprintf('criticalValue = %.4f\n', cValue);
+    fprintf('-------------------------\n');
+end
+
 % save into myobs.mat
-save myobs_DE gy_obs gc_obs gi_obs h_obs T pi_obs r_obs u_obs;
+save myobs_DE gy_obs gc_obs gi_obs T pi_obs r_obs u_obs;
 
 figure;
-subplot(2,2,1)
+subplot(1,3,1)
 plot(T,gy_obs)
 xlim([min(T) max(T)]);
 title('output growth')
-subplot(2,2,2)
+subplot(1,3,2)
 plot(T,gc_obs)
 xlim([min(T) max(T)]);
 title('consumption growth')
-subplot(2,2,3)
+subplot(1,3,3)
 plot(T,gi_obs)
 xlim([min(T) max(T)]);
 title('investment growth')
-subplot(2,2,4)
-plot(T,h_obs)
-xlim([min(T) max(T)]);
-title('hours worked')
 
 figure;
 subplot(2,2,1)

@@ -220,8 +220,7 @@ estimated_params;
     rho_i,   .9,      ,       ,       beta_pdf,       .5,      0.2;
 
     sigmaC,  2,       ,       ,       normal_pdf,     1.5,     0.35;
-    sigmaL,  0.8,     ,       ,       gamma_pdf,      2,       0.5;
-    delta_N, .34,     ,       ,       beta_pdf,       .75,     0.1;
+    delta_N, .08,     ,       ,       beta_pdf,       .1,     0.05;
     kappa,   6,       ,       ,       gamma_pdf,      4,       1.5;
     xi,      30,    0,      ,       gamma_pdf,      30,     15;
     rho,     .45,     ,       ,       beta_pdf,       .75,     0.1;
@@ -235,7 +234,7 @@ estimation(datafile=myobs_FR,    % your datafile, must be in your current folder
 first_obs=1,                  % First data of the sample
 mode_compute=4,               % optimization algo, keep it to 4
 mh_replic=5000,               % number of sample in Metropolis-Hastings
-mh_jscale=0.3,                % adjust this to have an acceptance rate between 0.2 and 0.3
+mh_jscale=0.5,                % adjust this to have an acceptance rate between 0.2 and 0.3
 prefilter=1,                  % remove the mean in the data
 lik_init=2,                   % Don't touch this,
 mh_nblocks=1,                 % number of mcmc chains

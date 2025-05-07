@@ -37,7 +37,7 @@ epsilon = 10;		% Elasticity between goods
 rho 	= .8;		% Monetary policy smoothing
 phi_y	= 0.1;		% Monetary policy reaction to output
 phi_pi	= 1.5;		% Monetary policy reaction to inflation
-xi 		= 80;		% Adjustment costs on prices
+xi 		= 30;		% Adjustment costs on prices
 kappa	= 4;		% adjustment costs on investment
 gamma	= .85;		% unemployment insurance as % of real wage
 varphi	= 0.2;		% elasticity of emission to GDP
@@ -220,21 +220,21 @@ estimated_params;
     rho_i,   .9,      ,       ,       beta_pdf,       .5,      0.2;
 
     sigmaC,  2,       ,       ,       normal_pdf,     1.5,     0.35;
-    sigmaL,  0.8,     ,       ,       gamma_pdf,      2,       0.5;
-    delta_N, .34,     ,       ,       beta_pdf,       .75,     0.1;
+    delta_N, .08,     ,       ,       beta_pdf,       .1,     0.05;
     kappa,   6,       ,       ,       gamma_pdf,      4,       1.5;
-    xi,      106,    0,      ,       gamma_pdf,      100,     15;
+    xi,      30,    0,      ,       gamma_pdf,      30,     15;
     rho,     .45,     ,       ,       beta_pdf,       .75,     0.1;
-    phi_pi,  1.8,     ,       ,       gamma_pdf,      1.5,     0.25;
+    phi_pi,  1.8,     ,       ,       gamma_pdf,      1.75,     0.5;
     phi_y,   0.05,    ,       ,       gamma_pdf,      0.12,    0.05;
 end;
+
 
 %%% estimation of the model
 estimation(datafile=myobs_DE,    % your datafile, must be in your current folder
 first_obs=1,                  % First data of the sample
 mode_compute=4,               % optimization algo, keep it to 4
 mh_replic=5000,               % number of sample in Metropolis-Hastings
-mh_jscale=0.5,                % adjust this to have an acceptance rate between 0.2 and 0.3
+mh_jscale=0.48,                % adjust this to have an acceptance rate between 0.2 and 0.3
 prefilter=1,                  % remove the mean in the data
 lik_init=2,                   % Don't touch this,
 mh_nblocks=1,                 % number of mcmc chains

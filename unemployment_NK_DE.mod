@@ -229,12 +229,13 @@ estimated_params;
 end;
 
 
+
 %%% estimation of the model
 estimation(datafile=myobs_DE,    % your datafile, must be in your current folder
 first_obs=1,                  % First data of the sample
 mode_compute=4,               % optimization algo, keep it to 4
 mh_replic=5000,               % number of sample in Metropolis-Hastings
-mh_jscale=0.48,                % adjust this to have an acceptance rate between 0.2 and 0.3
+mh_jscale=0.48,               % adjust this to have an acceptance rate between 0.2 and 0.3
 prefilter=1,                  % remove the mean in the data
 lik_init=2,                   % Don't touch this,
 mh_nblocks=1,                 % number of mcmc chains
@@ -254,11 +255,145 @@ for ix = 1:size(fx,1)
 	M_.Sigma_e(idx,idx) = eval(['oo_.posterior_mean.shocks_std.' fx{ix}])^2;
 end
 
+
 % SIMULATE THE ESTIMATED MODEL
-stoch_simul(irf=30,conditional_variance_decomposition=[1,4,10,100],order=1) gy_obs pi_obs r_obs u_obs;
-
-% DECOMPOSE THE SHOCK ACCORDING TO GDP GROWTH, INFLATION, AND INTEREST RATE
-shock_decomposition gy_obs pi_obs r_obs u_obs;
+% stoch_simul(irf=30,conditional_variance_decomposition=[1,4,10,100],order=1) y c i pi r u x w;
 
 
-% stoch_simul(irf=30,order=1) y c i pi r u x ;
+load(options_.datafile);
+if exist('T') ==1
+	Tvec = T;
+else
+	Tvec = 1:size(dataset_,1);
+end
+Tfreq = mean(diff(Tvec));
+
+
+%%%%%%%%%%%%%%%%% COUNTERFACTUAL EXERCISES %%%%%%%%%%%%%%%%%%
+%% stacks shocks in matrix
+fx = fieldnames(oo_.SmoothedShocks);
+for ix=1:size(fx,1)
+	shock_mat = eval(['oo_.SmoothedShocks.' fx{ix}]);
+	if ix==1; ee_mat = zeros(length(shock_mat),M_.exo_nbr); end;
+	ee_mat(:,strmatch(fx{ix},M_.exo_names,'exact')) = shock_mat;
+end
+
+%%% Simulate baseline scenario
+% solve decision rule
+[oo_.dr, info, M_.params] = resol(0, M_, options_, oo_.dr, oo_.dr.ys, oo_.exo_steady_state, oo_.exo_det_steady_state);
+% simulate the model
+y_            = simult_(M_,options_,oo_.dr.ys,oo_.dr,ee_mat,options_.order);
+
+%%% Simulate alternative scenario: reducing UI
+% make a copy
+Mx  = M_;
+oox = oo_;
+% change parameter
+Mx.params(strcmp('gamma',M_.param_names)) = .1;
+% solve new decision rule
+steady;
+[oox.dr, info, Mx.params] = resol(0, Mx, options_, oox.dr, oox.dr.ys, oox.exo_steady_state, oox.exo_det_steady_state);
+y_lessUI            = simult_(Mx,options_,oox.dr.ys,oox.dr,ee_mat,options_.order);
+
+%%% Simulate alternative scenario: increasing UI
+% make a copy
+Mx  = M_;
+oox = oo_;
+% change parameter
+Mx.params(strcmp('gamma',M_.param_names)) = 1;
+% solve new decision rule
+steady;
+[oox.dr, info, Mx.params] = resol(0, Mx, options_, oox.dr, oox.dr.ys, oox.exo_steady_state, oox.exo_det_steady_state);
+y_moreUI            = simult_(Mx,options_,oox.dr.ys,oox.dr,ee_mat,options_.order);
+
+% draw result
+var_names={'y','c','i','pi','r','u','w'};
+Ty = [T(1)-Tfreq;T];
+draw_tables(var_names,M_,Ty,[],y_,y_lessUI,y_moreUI)
+legend('Baseline','Reduce UI','Increase UI')
+
+%%%%%%%%%%%%%%%%% FORECAST UNDER ALTERNATIVE POLICY %%%%%%%%%%%%%%%%%%
+Thorizon 	= 12; % number of quarters for simulation
+% Built baseline forecast
+fx = fieldnames(oo_.SmoothedShocks);
+for ix=1:size(fx,1)
+	shock_mat = eval(['oo_.SmoothedShocks.' fx{ix}]);
+	if ix==1; ee_mat2 = zeros(length(shock_mat),M_.exo_nbr); end;
+	ee_mat2(:,strmatch(fx{ix},M_.exo_names,'exact')) = shock_mat;
+end
+% add mean-wise forecast with zero mean shocks
+ee_mat2 	= [ee_mat;zeros(Thorizon,M_.exo_nbr)];
+Tvec2 		= Tvec(1):Tfreq:(Tvec(1)+size(ee_mat2,1)*Tfreq);
+
+%%% Simulate baseline scenario
+% solve decision rule
+[oo_.dr, info, M_.params] = resol(0, M_, options_, oo_.dr, oo_.dr.ys, oo_.exo_steady_state, oo_.exo_det_steady_state);
+% simulate the model
+y_baseline            = simult_(M_,options_,oo_.dr.ys,oo_.dr,ee_mat2,options_.order);
+
+%%% Scenario 1: Lower Unemployment Insurance (gamma = 0.1)
+% make a copy of model and shock matrix
+Mx_lowerUI  = M_;
+oox_lowerUI = oo_;
+
+% Update the gamma parameter to 0.1
+Mx_lowerUI.params(strcmp('gamma', M_.param_names)) = 0.1;
+
+% solve decision rule for new scenario
+[oox_lowerUI.dr, info, Mx_lowerUI.params] = resol(0, Mx_lowerUI, options_, oox_lowerUI.dr, oox_lowerUI.dr.ys, oox_lowerUI.exo_steady_state, oox_lowerUI.exo_det_steady_state);
+
+% simulate the model with lower UI
+y_lowerUI = simult_(Mx_lowerUI, options_, oox_lowerUI.dr.ys, oox_lowerUI.dr, ee_mat2, options_.order);
+
+%%% Scenario 2: Higher Unemployment Insurance (gamma = 1.0)
+% make a copy of model and shock matrix
+Mx_higherUI  = M_;
+oox_higherUI = oo_;
+
+% Update the gamma parameter to 1.0
+Mx_higherUI.params(strcmp('gamma', M_.param_names)) = 1.0;
+
+% solve decision rule for new scenario
+[oox_higherUI.dr, info, Mx_higherUI.params] = resol(0, Mx_higherUI, options_, oox_higherUI.dr, oox_higherUI.dr.ys, oox_higherUI.exo_steady_state, oox_higherUI.exo_det_steady_state);
+
+% simulate the model with higher UI
+y_higherUI = simult_(Mx_higherUI, options_, oox_higherUI.dr.ys, oox_higherUI.dr, ee_mat2, options_.order);
+
+%%% Simulate alternative scenario: fiscal shock (for comparison)
+% make a copy of shock matrix
+ee_matx = ee_mat2;
+% select fiscal shock
+idx = strmatch('eta_g',M_.exo_names,'exact');
+ee_matx(end-Thorizon+1,idx) = 0.05; % add a 5 percent increase in public spending
+% simulate the model
+y_fiscal = simult_(M_,options_,oo_.dr.ys,oo_.dr,ee_matx,options_.order);
+
+%%% Simulate alternative scenario: carbon price shock (for comparison)
+% make a copy of shock matrix
+ee_matx = ee_mat2;
+% select carbon shock
+idx = strmatch('eta_t',M_.exo_names,'exact');
+ee_matx(end-Thorizon+1,idx) = 0.5; % add a 50 percent increase in carbon price 
+% simulate the model
+y_carbon = simult_(M_,options_,oo_.dr.ys,oo_.dr,ee_matx,options_.order);
+
+%%% Simulate alternative scenario: monetary policy shock (for comparison)
+% make a copy of shock matrix
+ee_matx = ee_mat2;
+% select monetary policy shock
+idx = strmatch('eta_r',M_.exo_names,'exact');
+ee_matx(end-Thorizon+1,idx) = -0.05; % add a negative monetary policy shock 
+% simulate the model
+y_monetary = simult_(M_,options_,oo_.dr.ys,oo_.dr,ee_matx,options_.order);
+
+% Now we will plot the results for all scenarios
+
+% Define variables to observe and plot
+var_names={'y','c','i','pi','r','u','w'};
+
+% Time vector for plotting
+Ty = [T(1)-Tfreq;T];
+
+% Plot the results
+draw_tables(var_names, M_, Tvec2, [2023 Tvec2(end)], y_baseline, y_lowerUI, y_higherUI, y_fiscal, y_carbon, y_monetary);
+legend('Baseline', 'Lower UI (gamma=0.1)', 'Higher UI (gamma=1.0)', 'Fiscal Shock', 'Carbon Price Shock', 'Monetary Policy Shock');

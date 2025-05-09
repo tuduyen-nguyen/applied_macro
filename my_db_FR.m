@@ -85,33 +85,27 @@ end
 save myobs_FR gy_obs gc_obs gi_obs T pi_obs r_obs u_obs;
 
 figure;
-subplot(1,3,1)
+subplot(2,3,1)
 plot(T,gy_obs)
 xlim([min(T) max(T)]);
 title('output growth')
-subplot(1,3,2)
+subplot(2,3,2)
 plot(T,gc_obs)
 xlim([min(T) max(T)]);
 title('consumption growth')
-subplot(1,3,3)
+subplot(2,3,3)
 plot(T,gi_obs)
 xlim([min(T) max(T)]);
 title('investment growth')
-
-figure;
-subplot(2,2,1)
-plot(T,gy_obs)
-xlim([min(T) max(T)]);
-title('output growth')
-subplot(2,2,2)
+subplot(2,3,4)
 plot(T,pi_obs)
 xlim([min(T) max(T)]);
 title('inflation rate')
-subplot(2,2,3)
+subplot(2,3,5)
 plot(T,r_obs)
 xlim([min(T) max(T)]);
 title('nominal rate')
-subplot(2,2,4)
+subplot(2,3,6)
 plot(T,u_obs);
 xlim([min(T) max(T)]);
 title('unemployment rate')

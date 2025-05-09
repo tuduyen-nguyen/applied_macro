@@ -24,7 +24,7 @@ parameters beta delta alpha sigmaC sigmaL delta_N chi phi gy b  Gam eta gamma ep
 %----------------------------------------------------------------
 % 2. Calibration
 %----------------------------------------------------------------
-delta_N = .01;		% separation rate %
+delta_N = .1;		% separation rate %
 eta		= .62;		% negotiation share %
 phi		= 0.3;		% shape hiring cost function %
 beta 	= 0.9922; 	% Discount factor firms %
@@ -36,7 +36,7 @@ sigmaL 	= 4; 		% Elasticity of labor %
 epsilon = 6;		% Elasticity between goods %
 rho 	= .83;		% Monetary policy smoothing %
 phi_y	= 0.3;		% Monetary policy reaction to output %
-phi_pi	= 0.2;		% Monetary policy reaction to inflation %
+phi_pi	= 1.7;		% Monetary policy reaction to inflation %
 xi 		= 30;		% Adjustment costs on prices
 kappa	= 4;		% adjustment costs on investment
 gamma	= .63;		% unemployment insurance as % of real wage
@@ -256,8 +256,72 @@ for ix = 1:size(fx,1)
 end
 
 
-% SIMULATE THE ESTIMATED MODEL
-stoch_simul(irf=30,conditional_variance_decomposition=[1,4,10,100],order=1) y c i pi r u x w;
+% First run the IRFs
+stoch_simul(order=1, irf=30) y u;
+
+% List of shocks
+shock_list = {'eta_a', 'eta_g', 'eta_c', 'eta_m', 'eta_i', 'eta_r'};
+shock_name = {'Technology', 'Fiscal', 'Consumption', 'Markup', 'Investment', 'Monetary'};
+
+% Maximum IRF horizon
+max_horizon = 30;
+
+% Initialize storage for results
+okun_elasticities = zeros(max_horizon, length(shock_list));
+
+% Loop over shocks and horizons
+for s = 1:length(shock_list)
+    shock = shock_list{s};
+    
+    % Dynamically extract IRFs
+    y_irf_name = ['y_', shock];
+    u_irf_name = ['u_', shock];
+    
+    if isfield(oo_.irfs, y_irf_name) && isfield(oo_.irfs, u_irf_name)
+        y_irf = oo_.irfs.(y_irf_name);
+        u_irf = oo_.irfs.(u_irf_name);
+        
+        for h = 1:max_horizon
+            % Cumulative response up to horizon h
+            cum_y = sum(y_irf(1:h));
+            cum_u = sum(u_irf(1:h));
+            
+            % Avoid divide-by-zero
+            if abs(cum_y) > 1e-6
+                okun_elasticities(h, s) = cum_u / cum_y;
+            else
+                okun_elasticities(h, s) = NaN;
+            end
+        end
+    else
+        okun_elasticities(:, s) = NaN;
+        warning('Missing IRF for shock %s', shock);
+    end
+end
+
+% Display results
+fprintf('\nOkun elasticities (cumulative response of u / y)\n');
+fprintf('Horizon | %10s %10s %10s %10s %10s %10s\n', shock_list{:});
+for h = 1:max_horizon
+    fprintf('%7d |', h);
+    fprintf(' %10.4f', okun_elasticities(h, :));
+    fprintf('\n');
+end
+
+% Plot Okun elasticities over horizons
+figure;
+hold on;
+colors = lines(length(shock_list)); % Distinct colors for each line
+
+for s = 1:length(shock_list)
+    plot(1:max_horizon, okun_elasticities(:,s), 'LineWidth', 2, 'Color', colors(s,:), 'DisplayName', shock_name{s});
+end
+
+xlabel('IRF Horizon (quarters)');
+ylabel('Okun Elasticity (cumulative u / y)');
+title('IRF-Based Okun Elasticity by Shock and Horizon');
+legend('show', 'Location', 'best');
+grid on;
 
 
 load(options_.datafile);

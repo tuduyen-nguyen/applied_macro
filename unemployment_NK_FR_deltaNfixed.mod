@@ -220,7 +220,6 @@ estimated_params;
     rho_i,   .9,      ,       ,       beta_pdf,       .5,      0.2;
 
     sigmaC,  2,       ,       ,       normal_pdf,     1.5,     0.35;
-    delta_N, .08,     ,       ,       beta_pdf,       .05,     0.04;
     kappa,   6,       ,       ,       gamma_pdf,      4,       1.5;
     xi,      30,    0,      ,       gamma_pdf,      30,     15;
     rho,     .45,     ,       ,       beta_pdf,       .75,     0.1;

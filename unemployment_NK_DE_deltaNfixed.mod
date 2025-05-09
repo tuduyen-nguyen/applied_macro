@@ -25,12 +25,12 @@ parameters beta delta alpha sigmaC sigmaL delta_N chi phi gy b  Gam eta gamma ep
 % 2. Calibration
 %----------------------------------------------------------------
 delta_N = .18;		% separation rate %
-eta		= .685;		% negotiation share %
-phi		= 0.13;		% shape hiring cost function %
+eta		= .62;		% negotiation share %
+phi		= 0.3;		% shape hiring cost function %
 beta 	= 0.9922; 	% Discount factor firms %
 delta 	= 0.02;	    % Depreciation rate %
-alpha 	= 0.197;	% Capital share %
-gy 		= 0.2374;   % Public spending in GDP %
+alpha 	= 0.217;	% Capital share %
+gy 		= 0.2326;   % Public spending in GDP %
 sigmaC 	= 1.13;		% Consumption risk aversion %
 sigmaL 	= 4; 		% Elasticity of labor %
 epsilon = 6;		% Elasticity between goods %
@@ -39,17 +39,17 @@ phi_y	= 0.3;		% Monetary policy reaction to output %
 phi_pi	= 1.7;		% Monetary policy reaction to inflation %
 xi 		= 30;		% Adjustment costs on prices
 kappa	= 4;		% adjustment costs on investment
-gamma	= .71;		% unemployment insurance as % of real wage
+gamma	= .63;		% unemployment insurance as % of real wage
 varphi	= 0.3;		% elasticity of emission to GDP %
 piss	= 1.005;	% steady state inflation %
 
 % value of main variables:
 tau0 	= 44.6 /1000;	% value of carbon tax (euros/ton) %
-sig		= 0.133; 		% Carbon intensity fr 0.4 Gt / Trillions euros %
-y0	 	= 3;		% trillions euros PPA https://data.worldbank.org/indicator/NY.GDP.MKTP.CD %
+sig		= 0.150; 		% Carbon intensity fr 0.4 Gt / Trillions euros %
+y0	 	= 4.5;		% trillions euros PPA https://data.worldbank.org/indicator/NY.GDP.MKTP.CD %
 theta1  = 0.05;		% level of abatement costs
 theta2  = 2.6;		% curvature abatement cost
-Hss		= 0.33;		% labor supply in ss %
+Hss		= 0.41;		% labor supply in ss %
 
 % autoregressive roots parameters
 rho_a	= 0.95;
@@ -220,21 +220,21 @@ estimated_params;
     rho_i,   .9,      ,       ,       beta_pdf,       .5,      0.2;
 
     sigmaC,  2,       ,       ,       normal_pdf,     1.5,     0.35;
-    delta_N, .08,     ,       ,       beta_pdf,       .05,     0.04;
     kappa,   6,       ,       ,       gamma_pdf,      4,       1.5;
-    xi,      30,    0,      ,       gamma_pdf,      30,     15;
+    xi,      30,    0,      ,       gamma_pdf,      50,     15;
     rho,     .45,     ,       ,       beta_pdf,       .75,     0.1;
-    phi_pi,  1.8,     ,       ,       gamma_pdf,      1.5,     0.25;
+    phi_pi,  1.8,     ,       ,       gamma_pdf,      1.75,     0.5;
     phi_y,   0.05,    ,       ,       gamma_pdf,      0.12,    0.05;
 end;
 
 
+
 %%% estimation of the model
-estimation(datafile=myobs_FR,    % your datafile, must be in your current folder
+estimation(datafile=myobs_DE,    % your datafile, must be in your current folder
 first_obs=1,                  % First data of the sample
 mode_compute=4,               % optimization algo, keep it to 4
 mh_replic=5000,               % number of sample in Metropolis-Hastings
-mh_jscale=0.48,                % adjust this to have an acceptance rate between 0.2 and 0.3
+mh_jscale=0.48,               % adjust this to have an acceptance rate between 0.2 and 0.3
 prefilter=1,                  % remove the mean in the data
 lik_init=2,                   % Don't touch this,
 mh_nblocks=1,                 % number of mcmc chains
@@ -253,6 +253,7 @@ for ix = 1:size(fx,1)
 	idx = strmatch(fx{ix},M_.exo_names,'exact');
 	M_.Sigma_e(idx,idx) = eval(['oo_.posterior_mean.shocks_std.' fx{ix}])^2;
 end
+
 
 % First run the IRFs
 stoch_simul(order=1, irf=30) y u;
@@ -321,6 +322,7 @@ title('IRF-Based Okun Elasticity by Shock and Horizon');
 legend('show', 'Location', 'best');
 grid on;
 
+
 load(options_.datafile);
 if exist('T') ==1
 	Tvec = T;
@@ -328,6 +330,7 @@ else
 	Tvec = 1:size(dataset_,1);
 end
 Tfreq = mean(diff(Tvec));
+
 
 %%%%%%%%%%%%%%%%% COUNTERFACTUAL EXERCISES %%%%%%%%%%%%%%%%%%
 %% stacks shocks in matrix
@@ -370,7 +373,7 @@ y_moreUI            = simult_(Mx,options_,oox.dr.ys,oox.dr,ee_mat,options_.order
 var_names={'y','c','i','pi','r','u','w'};
 Ty = [T(1)-Tfreq;T];
 draw_tables(var_names,M_,Ty,[],y_,y_lessUI,y_moreUI)
-legend('Baseline','Lower UI (gamma=0.1)','Higher UI (gamma=1.0)')
+legend('Baseline','Reduce UI','Increase UI')
 
 %%%%%%%%%%%%%%%%% FORECAST UNDER ALTERNATIVE POLICY %%%%%%%%%%%%%%%%%%
 Thorizon 	= 12; % number of quarters for simulation

@@ -230,7 +230,7 @@ estimated_params;
 end;
 
 %%% estimation of the model
-estimation(datafile=myobs,    % your datafile, must be in your current folder
+estimation(datafile=myobs_US,    % your datafile, must be in your current folder
 first_obs=1,                  % First data of the sample
 mode_compute=4,               % optimization algo, keep it to 4
 mh_replic=5000,               % number of sample in Metropolis-Hastings
@@ -255,10 +255,63 @@ for ix = 1:size(fx,1)
 end
 
 % SIMULATE THE ESTIMATED MODEL
-stoch_simul(irf=30,conditional_variance_decomposition=[1,4,10,100],order=1) gy_obs pi_obs r_obs u_obs;
+stoch_simul(irf=30,conditional_variance_decomposition=[1,4,10,100],order=1) y c i pi r u x ;
 
 % DECOMPOSE THE SHOCK ACCORDING TO GDP GROWTH, INFLATION, AND INTEREST RATE
-shock_decomposition gy_obs pi_obs r_obs u_obs;
+% shock_decomposition gy_obs pi_obs r_obs u_obs;
+
+
+load(options_.datafile);
+if exist('T') ==1
+	Tvec = T;
+else
+	Tvec = 1:size(dataset_,1);
+end
+Tfreq = mean(diff(Tvec));
+
+%%%%%%%%%%%%%%%%% COUNTERFACTUAL EXERCISES %%%%%%%%%%%%%%%%%%
+%% stacks shocks in matrix
+fx = fieldnames(oo_.SmoothedShocks);
+for ix=1:size(fx,1)
+	shock_mat = eval(['oo_.SmoothedShocks.' fx{ix}]);
+	if ix==1; ee_mat = zeros(length(shock_mat),M_.exo_nbr); end;
+	ee_mat(:,strmatch(fx{ix},M_.exo_names,'exact')) = shock_mat;
+end
+
+%%% Simulate baseline scenario
+% solve decision rule
+[oo_.dr, info, M_.params] = resol(0, M_, options_, oo_.dr, oo_.dr.ys, oo_.exo_steady_state, oo_.exo_det_steady_state);
+% simulate the model
+y_            = simult_(M_,options_,oo_.dr.ys,oo_.dr,ee_mat,options_.order);
+
+%%% Simulate alternative scenario: reducing UI
+% make a copy
+Mx  = M_;
+oox = oo_;
+% change parameter
+Mx.params(strcmp('gamma',M_.param_names)) = 0;
+disp(Mx.params);
+% solve new decision rule
+[oox.dr, info, Mx.params] = resol(0, Mx, options_, oox.dr, oox.dr.ys, oox.exo_steady_state, oox.exo_det_steady_state);
+y_lessUI            = simult_(Mx,options_,oox.dr.ys,oox.dr,ee_mat,options_.order);
+
+%%% Simulate alternative scenario: increasing UI
+% make a copy
+Mx  = M_;
+oox = oo_;
+% change parameter
+Mx.params(strcmp('gamma',M_.param_names)) = 1;
+disp(Mx.params);
+% solve new decision rule
+[oox.dr, info, Mx.params] = resol(0, Mx, options_, oox.dr, oox.dr.ys, oox.exo_steady_state, oox.exo_det_steady_state);
+y_moreUI            = simult_(Mx,options_,oox.dr.ys,oox.dr,ee_mat,options_.order);
+
+% draw result
+var_names={'y','c','i','pi','r','u','w'};
+Ty = [T(1)-Tfreq;T];
+draw_tables(var_names,M_,Ty,[],y_,y_lessUI,y_moreUI)
+legend('Baseline','Reduce UI','Increase UI')
+
 
 
 % stoch_simul(irf=30,order=1) y c i pi r u x ;

@@ -217,7 +217,7 @@ end;
 
 
 %%% estimation of the model
-estimation(datafile=myobs,	% your datafile, must be in your current folder
+estimation(datafile=myobs_US,	% your datafile, must be in your current folder
 first_obs=1,				% First data of the sample
 mode_compute=4,				% optimization algo, keep it to 4
 mh_replic=5000,				% number of sample in Metropolis-Hastings

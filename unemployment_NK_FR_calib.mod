@@ -220,7 +220,7 @@ estimated_params;
     rho_i,   .9,      ,       ,       beta_pdf,       .5,      0.2;
 
     sigmaC,  2,       ,       ,       normal_pdf,     1.5,     0.35;
-    delta_N, .08,     ,       ,       beta_pdf,       .1,     0.05;
+    delta_N, .08,     ,       ,       beta_pdf,       .05,     0.04;
     kappa,   6,       ,       ,       gamma_pdf,      4,       1.5;
     xi,      30,    0,      ,       gamma_pdf,      30,     15;
     rho,     .45,     ,       ,       beta_pdf,       .75,     0.1;
@@ -234,7 +234,7 @@ estimation(datafile=myobs_FR,    % your datafile, must be in your current folder
 first_obs=1,                  % First data of the sample
 mode_compute=4,               % optimization algo, keep it to 4
 mh_replic=5000,               % number of sample in Metropolis-Hastings
-mh_jscale=0.51,                % adjust this to have an acceptance rate between 0.2 and 0.3
+mh_jscale=0.48,                % adjust this to have an acceptance rate between 0.2 and 0.3
 prefilter=1,                  % remove the mean in the data
 lik_init=2,                   % Don't touch this,
 mh_nblocks=1,                 % number of mcmc chains
@@ -307,7 +307,7 @@ y_moreUI            = simult_(Mx,options_,oox.dr.ys,oox.dr,ee_mat,options_.order
 var_names={'y','c','i','pi','r','u','w'};
 Ty = [T(1)-Tfreq;T];
 draw_tables(var_names,M_,Ty,[],y_,y_lessUI,y_moreUI)
-legend('Baseline','Reduce UI','Increase UI')
+legend('Baseline','Lower UI (gamma=0.1)','Higher UI (gamma=1.0)')
 
 %%%%%%%%%%%%%%%%% FORECAST UNDER ALTERNATIVE POLICY %%%%%%%%%%%%%%%%%%
 Thorizon 	= 12; % number of quarters for simulation

@@ -222,7 +222,7 @@ estimated_params;
     sigmaC,  2,       ,       ,       normal_pdf,     1.5,     0.35;
     delta_N, .08,     ,       ,       beta_pdf,       .1,     0.05;
     kappa,   6,       ,       ,       gamma_pdf,      4,       1.5;
-    xi,      30,    0,      ,       gamma_pdf,      30,     15;
+    xi,      30,    0,      ,       gamma_pdf,      50,     15;
     rho,     .45,     ,       ,       beta_pdf,       .75,     0.1;
     phi_pi,  1.8,     ,       ,       gamma_pdf,      1.75,     0.5;
     phi_y,   0.05,    ,       ,       gamma_pdf,      0.12,    0.05;
@@ -257,7 +257,7 @@ end
 
 
 % SIMULATE THE ESTIMATED MODEL
-% stoch_simul(irf=30,conditional_variance_decomposition=[1,4,10,100],order=1) y c i pi r u x w;
+stoch_simul(irf=30,conditional_variance_decomposition=[1,4,10,100],order=1) y c i pi r u x w;
 
 
 load(options_.datafile);

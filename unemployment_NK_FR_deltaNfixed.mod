@@ -328,6 +328,11 @@ else
 end
 Tfreq = mean(diff(Tvec));
 
+%%%%%%%%%%%%%%%%% SHOCK DECOMPOSITION %%%%%%%%%%%%%%%%%%
+
+shock_decomposition gy_obs u_obs;
+
+
 %%%%%%%%%%%%%%%%% COUNTERFACTUAL EXERCISES %%%%%%%%%%%%%%%%%%
 %% stacks shocks in matrix
 fx = fieldnames(oo_.SmoothedShocks);
@@ -348,7 +353,7 @@ y_            = simult_(M_,options_,oo_.dr.ys,oo_.dr,ee_mat,options_.order);
 Mx  = M_;
 oox = oo_;
 % change parameter
-Mx.params(strcmp('gamma',M_.param_names)) = .1;
+Mx.params(strcmp('gamma',M_.param_names)) = .4;
 % solve new decision rule
 steady;
 [oox.dr, info, Mx.params] = resol(0, Mx, options_, oox.dr, oox.dr.ys, oox.exo_steady_state, oox.exo_det_steady_state);
@@ -359,7 +364,7 @@ y_lessUI            = simult_(Mx,options_,oox.dr.ys,oox.dr,ee_mat,options_.order
 Mx  = M_;
 oox = oo_;
 % change parameter
-Mx.params(strcmp('gamma',M_.param_names)) = 1;
+Mx.params(strcmp('gamma',M_.param_names)) = 0.9;
 % solve new decision rule
 steady;
 [oox.dr, info, Mx.params] = resol(0, Mx, options_, oox.dr, oox.dr.ys, oox.exo_steady_state, oox.exo_det_steady_state);
@@ -369,7 +374,7 @@ y_moreUI            = simult_(Mx,options_,oox.dr.ys,oox.dr,ee_mat,options_.order
 var_names={'y','c','i','pi','r','u','w'};
 Ty = [T(1)-Tfreq;T];
 draw_tables(var_names,M_,Ty,[],y_,y_lessUI,y_moreUI)
-legend('Baseline','Lower UI (gamma=0.1)','Higher UI (gamma=1.0)')
+legend('Baseline','Lower UI (gamma=0.4)','Higher UI (gamma=0.9)')
 
 %%%%%%%%%%%%%%%%% FORECAST UNDER ALTERNATIVE POLICY %%%%%%%%%%%%%%%%%%
 Thorizon 	= 12; % number of quarters for simulation
@@ -396,7 +401,7 @@ Mx_lowerUI  = M_;
 oox_lowerUI = oo_;
 
 % Update the gamma parameter to 0.1
-Mx_lowerUI.params(strcmp('gamma', M_.param_names)) = 0.1;
+Mx_lowerUI.params(strcmp('gamma', M_.param_names)) = 0.4;
 
 % solve decision rule for new scenario
 [oox_lowerUI.dr, info, Mx_lowerUI.params] = resol(0, Mx_lowerUI, options_, oox_lowerUI.dr, oox_lowerUI.dr.ys, oox_lowerUI.exo_steady_state, oox_lowerUI.exo_det_steady_state);
@@ -410,7 +415,7 @@ Mx_higherUI  = M_;
 oox_higherUI = oo_;
 
 % Update the gamma parameter to 1.0
-Mx_higherUI.params(strcmp('gamma', M_.param_names)) = 1.0;
+Mx_higherUI.params(strcmp('gamma', M_.param_names)) = 0.9;
 
 % solve decision rule for new scenario
 [oox_higherUI.dr, info, Mx_higherUI.params] = resol(0, Mx_higherUI, options_, oox_higherUI.dr, oox_higherUI.dr.ys, oox_higherUI.exo_steady_state, oox_higherUI.exo_det_steady_state);
@@ -455,4 +460,4 @@ Ty = [T(1)-Tfreq;T];
 
 % Plot the results
 draw_tables(var_names, M_, Tvec2, [2023 Tvec2(end)], y_baseline, y_lowerUI, y_higherUI, y_fiscal, y_carbon, y_monetary);
-legend('Baseline', 'Lower UI (gamma=0.1)', 'Higher UI (gamma=1.0)', 'Fiscal Shock', 'Carbon Price Shock', 'Monetary Policy Shock');
+legend('Baseline', 'Lower UI (gamma=0.4)', 'Higher UI (gamma=0.9)', 'Fiscal Shock', 'Carbon Price Shock', 'Monetary Policy Shock');

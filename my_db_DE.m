@@ -31,7 +31,10 @@ r_obs	= (output_table(:,7)/400);
 % unemployment rate
 u_obs = (output_table(:,8)/100);
 
+% obtain Dynare directory
+% get_dynare_src = strrep(which('dynare'),'dynare.m','');
 % load dseries object
+% addpath([get_dynare_src 'modules\dseries\src\'],[get_dynare_src 'missing\rows_columns\'])
 initialize_dseries_class();
 % convert data into dseries object
 ts = dseries(u_obs, '2005Q1');

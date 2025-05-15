@@ -279,6 +279,8 @@ for s = 1:length(shock_list)
     if isfield(oo_.irfs, y_irf_name) && isfield(oo_.irfs, u_irf_name)
         y_irf = oo_.irfs.(y_irf_name);
         u_irf = oo_.irfs.(u_irf_name);
+        y_res(:,s) = y_irf
+        u_res(:,s) = u_irf
         
         for h = 1:max_horizon
             % Cumulative response up to horizon h
@@ -322,6 +324,35 @@ title('IRF-Based Okun Elasticity by Shock and Horizon');
 legend('show', 'Location', 'best');
 grid on;
 
+% Plot GDP over horizons
+figure;
+hold on;
+colors = lines(length(shock_list)); % Distinct colors for each line
+
+for s = 1:length(shock_list)
+    plot(1:max_horizon, y_res(:,s), 'LineWidth', 2, 'Color', colors(s,:), 'DisplayName', shock_name{s});
+end
+
+xlabel('IRF Horizon (quarters)');
+ylabel('GPD');
+title('IRF-Based GDP by Shock and Horizon');
+legend('show', 'Location', 'best');
+grid on;
+
+% Plot GDP over horizons
+figure;
+hold on;
+colors = lines(length(shock_list)); % Distinct colors for each line
+
+for s = 1:length(shock_list)
+    plot(1:max_horizon, u_res(:,s), 'LineWidth', 2, 'Color', colors(s,:), 'DisplayName', shock_name{s});
+end
+
+xlabel('IRF Horizon (quarters)');
+ylabel('Unemployment');
+title('IRF-Based Unemployment by Shock and Horizon');
+legend('show', 'Location', 'best');
+grid on;
 
 load(options_.datafile);
 if exist('T') ==1
